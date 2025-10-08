@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commuta - Pünktlich ankommen</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Commuta</h1>
+            <p class="tagline">Pünktlich ankommen, entspannt bleiben</p>
+        </header>
+
+        <main>
+            <!-- Home Screen -->
+            <div id="home-screen" class="screen active">
+                <div class="welcome">
+                    <i class="fas fa-clock fa-4x"></i>
+                    <h2>Willkommen bei Commuta</h2>
+                    <p>Wählen Sie ein gespeichertes Ziel oder fügen Sie ein neues hinzu.</p>
+                </div>
+                
+                <div class="destinations">
+                    <h3>Gespeicherte Ziele</h3>
+                    <ul id="destinations-list">
+                        <!-- Destinations will be loaded here -->
+                    </ul>
+                </div>
+                
+                <button id="add-destination-btn" class="button primary">Neues Ziel hinzufügen</button>
+            </div>
+
+            <!-- Add Destination Screen -->
+            <div id="add-destination-screen" class="screen">
+                <h2>Neues Ziel hinzufügen</h2>
+                
+                <form id="add-destination-form">
+                    <div class="form-group">
+                        <label for="destination-name">Name (z.B. Büro, Arzt)</label>
+                        <input type="text" id="destination-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="destination-address">Adresse</label>
+                        <input type="text" id="destination-address" required>
+                        <div id="address-suggestions"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancel-add" class="button secondary">Abbrechen</button>
+                        <button type="submit" class="button primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Destination Picker Screen -->
+            <div id="destination-picker-screen" class="screen">
+                <h2>Wie möchten Sie reisen?</h2>
+                
+                <div class="transport-modes">
+                    <div class="transport-mode" data-mode="driving">
+                        <i class="fas fa-car"></i>
+                        <span>Auto</span>
+                    </div>
+                    <div class="transport-mode" data-mode="transit">
+                        <i class="fas fa-bus"></i>
+                        <span>ÖPNV</span>
+                    </div>
+                    <div class="transport-mode" data-mode="bicycling">
+                        <i class="fas fa-bicycle"></i>
+                        <span>Fahrrad</span>
+                    </div>
+                    <div class="transport-mode" data-mode="walking">
+                        <i class="fas fa-walking"></i>
+                        <span>Zu Fuß</span>
+                    </div>
+                </div>
+                
+                <button id="start-countdown-btn" class="button primary" disabled>Countdown starten</button>
+                <button id="back-to-home-btn" class="button secondary">Zurück</button>
+            </div>
+
+            <!-- Countdown Screen -->
+            <div id="countdown-screen" class="screen">
+                <div class="destination-info">
+                    <h2 id="countdown-destination-name">Zielname</h2>
+                    <p id="countdown-destination-address">Zieladresse</p>
+                    <div id="transport-mode-display">
+                        <i class="fas fa-car"></i>
+                        <span id="transport-mode-text">Auto</span>
+                    </div>
+                </div>
+                
+                <div class="travel-info">
+                    <div class="info-item">
+                        <label>Entfernung</label>
+                        <span id="distance-text">0 km</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Fahrzeit</label>
+                        <span id="duration-text">0 min</span>
+                    </div>
+                </div>
+                
+                <div class="countdown">
+                    <label>Verbleibende Zeit</label>
+                    <div id="countdown-timer">00:00</div>
+                </div>
+                
+                <button id="stop-countdown-btn" class="button danger">Countdown stoppen</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
