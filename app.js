@@ -27,6 +27,15 @@ const elements = {
     stopCountdownBtn: document.getElementById('stop-countdown-btn')
 };
 
+// API Configuration
+const apiConfig = {
+    // Google API Key für Places und Directions APIs
+    apiKey: 'AIzaSyCkGTKAlxcdkNZ9oE9TJXQLLqNoNvXYbvg',
+    // Backend URLs (für n8n-Webhooks)
+    placesApiUrl: 'https://your-n8n-instance.example.com/webhook/commuta/places-search',
+    directionsApiUrl: 'https://your-n8n-instance.example.com/webhook/commuta/travel-time'
+};
+
 // App State
 const state = {
     destinations: [],
@@ -235,7 +244,40 @@ async function fetchTravelData() {
         const destination = state.destinations.find(d => d.id === state.selectedDestinationId);
         
         // For MVP, simulate API call
-        // In production, this would call the n8n workflow endpoint
+        // In production, this would call the n8n workflow endpoint with the actual Google API
+        const requestData = {
+            origin_lat: state.currentLocation.lat,
+            origin_lng: state.currentLocation.lng,
+            destination_lat: destination.latitude,
+            destination_lng: destination.longitude,
+            mode: state.selectedTransportMode
+        };
+        
+        // Uncomment this code when n8n backend is set up
+        /*
+        const response = await fetch(apiConfig.directionsApiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('API response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'OK') {
+            state.travelData = data.travel_data;
+            updateTravelDataUI();
+        } else {
+            throw new Error('API returned error status');
+        }
+        */
+        
+        // For MVP, use the simulation
         simulateTravelDataFetch(destination);
     } catch (error) {
         console.error('Error fetching travel data:', error);
@@ -330,6 +372,7 @@ function updateCountdownDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
+    const seconds = timeLeft % 60;
     
     // Format as HH:MM
     const formattedHours = String(hours).padStart(2, '0');
@@ -369,10 +412,57 @@ function setupAddressSearch() {
         }
         
         state.addressSearchTimeout = setTimeout(() => {
+            // Für einen vollständigen MVP würde hier die Google Places API über n8n aufgerufen werden
+            // searchAddressAPI(query);
+            
             // For MVP, simulate address search with dummy data
             simulateAddressSearch(query);
         }, 300);
     });
+}
+
+// Search address using API
+async function searchAddressAPI(query) {
+    try {
+        const response = await fetch(`${apiConfig.placesApiUrl}?query=${encodeURIComponent(query)}`);
+        
+        if (!response.ok) {
+            throw new Error('Places API response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'OK' && data.predictions) {
+            displayAddressSuggestions(data.predictions);
+        } else {
+            elements.addressSuggestions.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error fetching address suggestions:', error);
+        elements.addressSuggestions.style.display = 'none';
+    }
+}
+
+// Display address suggestions
+function displayAddressSuggestions(predictions) {
+    elements.addressSuggestions.innerHTML = '';
+    
+    if (predictions.length === 0) {
+        elements.addressSuggestions.style.display = 'none';
+        return;
+    }
+    
+    predictions.forEach(prediction => {
+        const div = document.createElement('div');
+        div.textContent = prediction.description;
+        div.addEventListener('click', () => {
+            elements.destinationAddressInput.value = prediction.description;
+            elements.addressSuggestions.style.display = 'none';
+        });
+        elements.addressSuggestions.appendChild(div);
+    });
+    
+    elements.addressSuggestions.style.display = 'block';
 }
 
 // Simulate address search (for MVP)
