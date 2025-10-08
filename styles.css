@@ -1,0 +1,356 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+.app-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Header Styles */
+header {
+    background-color: #3498db;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.tagline {
+    opacity: 0.8;
+    font-size: 0.9em;
+}
+
+/* Main Content Styles */
+main {
+    padding: 20px;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Home Screen */
+.welcome {
+    text-align: center;
+    margin: 30px 0;
+    color: #555;
+}
+
+.welcome i {
+    margin-bottom: 15px;
+    color: #3498db;
+}
+
+.destinations h3 {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+#destinations-list {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+#destinations-list li {
+    padding: 15px;
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#destinations-list li:hover {
+    background-color: #e9ecef;
+}
+
+.destination-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.destination-address {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.destination-info {
+    flex-grow: 1;
+}
+
+.destination-select {
+    color: #3498db;
+}
+
+/* Add Destination Screen */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#address-suggestions {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+#address-suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+#address-suggestions div:hover {
+    background-color: #f5f5f5;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+/* Transport Mode Selection */
+.transport-modes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.transport-mode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.transport-mode:hover {
+    background-color: #e9ecef;
+}
+
+.transport-mode.selected {
+    background-color: #3498db;
+    color: white;
+}
+
+.transport-mode i {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+/* Countdown Screen */
+.destination-info {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+#countdown-destination-address {
+    color: #6c757d;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+#transport-mode-display {
+    margin-top: 15px;
+    display: inline-flex;
+    align-items: center;
+    background-color: #e9ecef;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+#transport-mode-display i {
+    margin-right: 5px;
+    color: #3498db;
+}
+
+.travel-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.info-item {
+    text-align: center;
+    flex-basis: 48%;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.info-item label {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.info-item span {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.countdown {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.countdown label {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+#countdown-timer {
+    font-size: 3.5em;
+    font-weight: 700;
+    color: #3498db;
+    font-family: 'Courier New', monospace;
+}
+
+/* Buttons */
+.button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.button.primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.button.primary:hover {
+    background-color: #2980b9;
+}
+
+.button.primary:disabled {
+    background-color: #b3d7f0;
+    cursor: not-allowed;
+}
+
+.button.secondary {
+    background-color: #e9ecef;
+    color: #343a40;
+}
+
+.button.secondary:hover {
+    background-color: #dee2e6;
+}
+
+.button.danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.button.danger:hover {
+    background-color: #c0392b;
+}
+
+/* Notification Banner */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(52, 152, 219, 0.9);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: none;
+}
+
+.notification.error {
+    background-color: rgba(231, 76, 60, 0.9);
+}
+
+.notification.warning {
+    background-color: rgba(241, 196, 15, 0.9);
+    color: #333;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.3s forwards;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 500px) {
+    .app-container {
+        width: 100%;
+        box-shadow: none;
+    }
+}
