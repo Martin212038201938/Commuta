@@ -18,7 +18,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extrahieren der Parameter aus dem Webhook-Request\nconst data = $input.item.json.body || $input.item.json;\n\n// Validierung der benötigten Parameter\nif (!data.query) {\n  return {\n    error: true,\n    message: 'Missing required parameter: query'\n  };\n}\n\nreturn {\n  query: data.query,\n  // Dummy API Key - in Produktion muss ein echter Google API Key verwendet werden\n  apiKey: 'YOUR_GOOGLE_API_KEY',\n  language: data.language || 'de',\n  // Optional: Beschränkung der Suche auf ein bestimmtes Land\n  components: data.country ? `country:${data.country}` : ''\n};"
+        "jsCode": "// Extrahieren der Parameter aus dem Webhook-Request\nconst data = $input.item.json.body || $input.item.json;\n\n// Validierung der benötigten Parameter\nif (!data.query) {\n  return {\n    error: true,\n    message: 'Missing required parameter: query'\n  };\n}\n\nreturn {\n  query: data.query,\n  // Echter Google API Key für Places API\n  apiKey: 'AIzaSyCkGTKAlxcdkNZ9oE9TJXQLLqNoNvXYbvg',\n  language: data.language || 'de',\n  // Optional: Beschränkung der Suche auf ein bestimmtes Land\n  components: data.country ? `country:${data.country}` : ''\n};"
       },
       "id": "f3b4b1a1-9eab-45b2-ba1b-e358cba1eee1",
       "name": "Extract Parameters",
