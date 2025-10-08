@@ -1,0 +1,124 @@
+{
+  "name": "Commuta - Places Search API",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "commuta/places-search",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7839e621-e4e9-4f8b-b7de-90cc9a41eacd",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrahieren der Parameter aus dem Webhook-Request\nconst data = $input.item.json.body || $input.item.json;\n\n// Validierung der benötigten Parameter\nif (!data.query) {\n  return {\n    error: true,\n    message: 'Missing required parameter: query'\n  };\n}\n\nreturn {\n  query: data.query,\n  // Dummy API Key - in Produktion muss ein echter Google API Key verwendet werden\n  apiKey: 'YOUR_GOOGLE_API_KEY',\n  language: data.language || 'de',\n  // Optional: Beschränkung der Suche auf ein bestimmtes Land\n  components: data.country ? `country:${data.country}` : ''\n};"
+      },
+      "id": "f3b4b1a1-9eab-45b2-ba1b-e358cba1eee1",
+      "name": "Extract Parameters",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://maps.googleapis.com/maps/api/place/autocomplete/json?input={{$json.query}}&key={{$json.apiKey}}&language={{$json.language}}{{$json.components ? '&components=' + $json.components : ''}}",
+        "options": {}
+      },
+      "id": "fbcd7b27-93e1-4ef7-b12d-dcabb8f77777",
+      "name": "Google Places API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Für den MVP simulieren wir die Antwort von Google Places API\n// In Produktion würde die tatsächliche API-Antwort verarbeitet werden\n\n// Extrahieren der Suchanfrage für Simulationszwecke\nconst query = $('Extract Parameters').item.json.query.toLowerCase();\n\n// Beispiel für simulierte Adressen\nconst sampleAddresses = [\n  {\n    place_id: 'place_1',\n    description: 'Hauptstraße 1, 10115 Berlin, Deutschland',\n    structured_formatting: {\n      main_text: 'Hauptstraße 1',\n      secondary_text: '10115 Berlin, Deutschland'\n    }\n  },\n  {\n    place_id: 'place_2',\n    description: 'Friedrichstraße 50, 10117 Berlin, Deutschland',\n    structured_formatting: {\n      main_text: 'Friedrichstraße 50',\n      secondary_text: '10117 Berlin, Deutschland'\n    }\n  },\n  {\n    place_id: 'place_3',\n    description: 'Kurfürstendamm 101, 10711 Berlin, Deutschland',\n    structured_formatting: {\n      main_text: 'Kurfürstendamm 101',\n      secondary_text: '10711 Berlin, Deutschland'\n    }\n  },\n  {\n    place_id: 'place_4',\n    description: 'Alexanderplatz, 10178 Berlin, Deutschland',\n    structured_formatting: {\n      main_text: 'Alexanderplatz',\n      secondary_text: '10178 Berlin, Deutschland'\n    }\n  },\n  {\n    place_id: 'place_5',\n    description: 'Potsdamer Platz, 10785 Berlin, Deutschland',\n    structured_formatting: {\n      main_text: 'Potsdamer Platz',\n      secondary_text: '10785 Berlin, Deutschland'\n    }\n  },\n  {\n    place_id: 'place_6',\n    description: 'Münchenstraße 43, 80335 München, Deutschland',\n    structured_formatting: {\n      main_text: 'Münchenstraße 43',\n      secondary_text: '80335 München, Deutschland'\n    }\n  },\n  {\n    place_id: 'place_7',\n    description: 'Kölner Dom, 50667 Köln, Deutschland',\n    structured_formatting: {\n      main_text: 'Kölner Dom',\n      secondary_text: '50667 Köln, Deutschland'\n    }\n  }\n];\n\n// Filtern der Adressen basierend auf der Suchanfrage\nlet filteredAddresses = sampleAddresses.filter(addr => \n  addr.description.toLowerCase().includes(query)\n);\n\n// Wenn keine Ergebnisse, geben wir eine leere Liste zurück\nif (filteredAddresses.length === 0 && query.length >= 3) {\n  // Für Test-Zwecke geben wir immer mindestens ein Ergebnis zurück\n  filteredAddresses = [{\n    place_id: 'place_default',\n    description: `${query} Straße 123, 10115 Berlin, Deutschland`,\n    structured_formatting: {\n      main_text: `${query} Straße 123`,\n      secondary_text: '10115 Berlin, Deutschland'\n    }\n  }];\n}\n\n// Rückgabe der formatierten Antwort\nreturn {\n  status: \"OK\",\n  predictions: filteredAddresses,\n  // Für Testzwecke auch die originalen Parameter zurückgeben\n  request: {\n    query: query,\n    language: $('Extract Parameters').item.json.language\n  }\n};"
+      },
+      "id": "4f44e1e8-e8c5-4f15-8b1d-9a44ba3fc5c5",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "1234a1a1-e8c5-1234-8b1d-9a44ba3fc5c5",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Parameters": {
+      "main": [
+        [
+          {
+            "node": "Google Places API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Places API": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
