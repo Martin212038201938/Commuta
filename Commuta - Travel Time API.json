@@ -1,0 +1,124 @@
+{
+  "name": "Commuta - Travel Time API",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "commuta/travel-time",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6482edb4-e6ee-4cb6-972c-89c53aaa5c69",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrahieren der Parameter aus dem Webhook-Request\nconst data = $input.item.json.body || $input.item.json;\n\n// Validierung der benötigten Parameter\nif (!data.origin_lat || !data.origin_lng || !data.destination_lat || !data.destination_lng || !data.mode) {\n  return {\n    error: true,\n    message: 'Missing required parameters: origin_lat, origin_lng, destination_lat, destination_lng, mode',\n    valid_modes: ['driving', 'walking', 'bicycling', 'transit']\n  };\n}\n\n// Formatierung der Koordinaten für die Google Directions API\nconst origin = `${data.origin_lat},${data.origin_lng}`;\nconst destination = `${data.destination_lat},${data.destination_lng}`;\nconst mode = data.mode;\n\nreturn {\n  origin,\n  destination,\n  mode,\n  // Dummy API Key - in Produktion muss ein echter Google API Key verwendet werden\n  apiKey: 'YOUR_GOOGLE_API_KEY',\n};"
+      },
+      "id": "7ef7850b-4a30-4d1f-bcb6-b70ca2b83c55",
+      "name": "Extract Parameters",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://maps.googleapis.com/maps/api/directions/json?origin={{$json.origin}}&destination={{$json.destination}}&mode={{$json.mode}}&key={{$json.apiKey}}",
+        "options": {}
+      },
+      "id": "a8f11af1-c58a-4d2a-8bc0-af6f4fd96aff",
+      "name": "Google Directions API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Für den MVP simulieren wir die Antwort von Google Directions API\n// In Produktion würde die tatsächliche API-Antwort verarbeitet werden\n\n// Extrahieren der Parameter für Simulationszwecke\nconst originParts = $('Extract Parameters').item.json.origin.split(',');\nconst destParts = $('Extract Parameters').item.json.destination.split(',');\nconst mode = $('Extract Parameters').item.json.mode;\n\n// Berechnen der ungefähren Entfernung (in Metern) zwischen zwei Koordinaten\nfunction getDistance(lat1, lon1, lat2, lon2) {\n  const R = 6371e3; // Erdradius in Metern\n  const φ1 = lat1 * Math.PI/180;\n  const φ2 = lat2 * Math.PI/180;\n  const Δφ = (lat2-lat1) * Math.PI/180;\n  const Δλ = (lon2-lon1) * Math.PI/180;\n\n  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +\n            Math.cos(φ1) * Math.cos(φ2) *\n            Math.sin(Δλ/2) * Math.sin(Δλ/2);\n  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));\n\n  return R * c; // in Metern\n}\n\n// Berechnen der Entfernung\nconst distanceInMeters = getDistance(\n  parseFloat(originParts[0]),\n  parseFloat(originParts[1]),\n  parseFloat(destParts[0]),\n  parseFloat(destParts[1])\n);\n\n// Berechnen der Dauer basierend auf dem Verkehrsmittel\nlet durationInSeconds = 0;\nswitch (mode) {\n  case 'driving':\n    durationInSeconds = Math.round(distanceInMeters / 10); // ca. 36 km/h\n    break;\n  case 'walking':\n    durationInSeconds = Math.round(distanceInMeters / 1.4); // ca. 5 km/h\n    break;\n  case 'transit':\n    durationInSeconds = Math.round(distanceInMeters / 7); // ca. 25 km/h + Wartezeit\n    break;\n  case 'bicycling':\n    durationInSeconds = Math.round(distanceInMeters / 3.5); // ca. 13 km/h\n    break;\n  default:\n    durationInSeconds = Math.round(distanceInMeters / 10); // Standard: Auto\n}\n\n// Formatieren der Distanz\nlet distanceText;\nif (distanceInMeters < 1000) {\n  distanceText = `${Math.round(distanceInMeters)}m`;\n} else {\n  distanceText = `${(distanceInMeters / 1000).toFixed(1)}km`;\n}\n\n// Formatieren der Dauer\nconst durationMinutes = Math.floor(durationInSeconds / 60);\nconst durationHours = Math.floor(durationMinutes / 60);\nconst remainingMinutes = durationMinutes % 60;\n\nlet durationText;\nif (durationHours > 0) {\n  durationText = `${durationHours} Std. ${remainingMinutes} Min.`;\n} else {\n  durationText = `${durationMinutes} Min.`;\n}\n\n// Rückgabe der formatierten Antwort\nreturn {\n  status: \"OK\",\n  travel_data: {\n    distance: {\n      meters: Math.round(distanceInMeters),\n      text: distanceText\n    },\n    duration: {\n      seconds: durationInSeconds,\n      text: durationText\n    },\n    departure_time: new Date().toISOString(),\n    arrival_time: new Date(Date.now() + durationInSeconds * 1000).toISOString()\n  },\n  mode: mode,\n  // Für Testzwecke auch die originalen Parameter zurückgeben\n  request: {\n    origin: $('Extract Parameters').item.json.origin,\n    destination: $('Extract Parameters').item.json.destination,\n    mode: mode\n  }\n};"
+      },
+      "id": "abbc61d7-31d6-42bb-a7ad-2651e0b65a24",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "9e67e2cf-d15c-44f5-9dab-e3a2e97e7516",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Parameters": {
+      "main": [
+        [
+          {
+            "node": "Google Directions API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Directions API": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
